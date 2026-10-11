@@ -370,10 +370,16 @@ pub struct BasicSettings {
     pub select_show_except_smallest_resolution: bool,
     #[serde(default = "ttrue")]
     pub select_show_except_biggest_resolution: bool,
+    #[serde(default = "default_selection_resolution_tolerance")]
+    pub selection_resolution_tolerance: i32,
     #[serde(default = "ttrue")]
     pub select_show_except_shortest_path: bool,
     #[serde(default = "ttrue")]
     pub select_show_except_longest_path: bool,
+}
+
+fn default_selection_resolution_tolerance() -> i32 {
+    1
 }
 
 impl Default for BasicSettings {

@@ -509,6 +509,29 @@ export component SettingsList inherits VerticalLayout {
             }
 
             SelectGridSection { }
+            HorizontalLayout {
+                spacing: 5px;
+                Text {
+                    text: Translations.settings_selection_resolution_tolerance_text;
+                    font-size: FontSizes.normal;
+                    vertical-alignment: center;
+                }
+                Slider {
+                    minimum: 0;
+                    maximum: 100;
+                    step: 1;
+                    value: Settings.selection_resolution_tolerance;
+                    changed => { Settings.selection_resolution_tolerance = round(self.value); }
+                }
+                Text {
+                    text: Settings.selection_resolution_tolerance + "%";
+                    font-size: FontSizes.normal;
+                    vertical-alignment: center;
+                }
+            }
+            HintText {
+                hint_text: Translations.settings_selection_resolution_tolerance_hint_text;
+            }
 
             HeaderText {
                 text <=> Translations.settings_cache_header_text;

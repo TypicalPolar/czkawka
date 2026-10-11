@@ -509,3 +509,7 @@ context_menu_copy_parent_folder_path_text = Copy Parent Folder
 context_menu_copy_full_path_text = Copy Full Path
 context_menu_rename_text = Rename
 
+
+selection_all_except_largest_file_near_highest_resolution = Select all except largest file near highest resolution
+settings_selection_resolution_tolerance_text = Resolution tolerance (%)
+settings_selection_resolution_tolerance_hint_text = Keeps the largest file among images within this percentage of the highest pixel count. Applies to "Select all except largest file near highest resolution". At 0%, only the highest resolution qualifies.

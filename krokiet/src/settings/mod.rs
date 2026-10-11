@@ -307,6 +307,7 @@ pub(crate) fn set_base_settings_to_gui(app: &MainWindow, basic_settings: &BasicS
     settings.set_select_show_except_biggest_size(basic_settings.select_show_except_biggest_size);
     settings.set_select_show_except_smallest_resolution(basic_settings.select_show_except_smallest_resolution);
     settings.set_select_show_except_biggest_resolution(basic_settings.select_show_except_biggest_resolution);
+    settings.set_selection_resolution_tolerance(basic_settings.selection_resolution_tolerance.clamp(0, 100));
     settings.set_select_show_except_shortest_path(basic_settings.select_show_except_shortest_path);
     settings.set_select_show_except_longest_path(basic_settings.select_show_except_longest_path);
 
@@ -1029,6 +1030,7 @@ pub(crate) fn collect_base_settings(app: &MainWindow) -> BasicSettings {
         select_show_except_biggest_size: settings.get_select_show_except_biggest_size(),
         select_show_except_smallest_resolution: settings.get_select_show_except_smallest_resolution(),
         select_show_except_biggest_resolution: settings.get_select_show_except_biggest_resolution(),
+        selection_resolution_tolerance: settings.get_selection_resolution_tolerance().clamp(0, 100),
         select_show_except_shortest_path: settings.get_select_show_except_shortest_path(),
         select_show_except_longest_path: settings.get_select_show_except_longest_path(),
     }

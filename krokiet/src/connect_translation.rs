@@ -367,6 +367,8 @@ fn translate_items(app: &MainWindow) {
     translation.set_clean_exif_overwrite_files_text(flk!("clean_exif_overwrite_files_text").into());
     translation.set_stop_text(flk!("stop_text").into());
     translation.set_settings_cache_header_text(flk!("settings_cache_header_text").into());
+    translation.set_settings_selection_resolution_tolerance_text(flk!("settings_selection_resolution_tolerance_text").into());
+    translation.set_settings_selection_resolution_tolerance_hint_text(flk!("settings_selection_resolution_tolerance_hint_text").into());
     translation.set_settings_select_header_text(flk!("settings_select_header_text").into());
     translation.set_settings_select_group_size_text(flk!("settings_select_group_size_text").into());
     translation.set_settings_select_group_date_text(flk!("settings_select_group_date_text").into());
@@ -543,6 +545,7 @@ pub(crate) fn translate_select_mode(select_mode: SelectMode) -> SharedString {
         SelectMode::SelectLongestPath => flk!("selection_longest_path").into(),
         SelectMode::SelectAllExceptBiggestSize => flk!("selection_all_except_biggest_size").into(),
         SelectMode::SelectAllExceptSmallestSize => flk!("selection_all_except_smallest_size").into(),
+        SelectMode::SelectAllExceptLargestFileNearHighestResolution => flk!("selection_all_except_largest_file_near_highest_resolution").into(),
         SelectMode::SelectAllExceptBiggestResolutionAndSize => flk!("selection_all_except_biggest_resolution_and_size").into(),
         SelectMode::SelectAllExceptBiggestResolution => flk!("selection_all_except_biggest_resolution").into(),
         SelectMode::SelectAllExceptSmallestResolution => flk!("selection_all_except_smallest_resolution").into(),
