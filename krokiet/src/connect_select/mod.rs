@@ -1,9 +1,11 @@
 pub(crate) mod custom_select;
+mod property_selection;
 
 use std::collections::BTreeMap;
 use std::sync::{Arc, Mutex};
 
 use log::error;
+use property_selection::select_all_except_by_property;
 use regex::Regex;
 use slint::{ComponentHandle, Model, ModelRc, SharedString, VecModel};
 
@@ -55,6 +57,12 @@ pub(crate) fn connect_select(app: &MainWindow, shared_models: &Arc<Mutex<SharedM
             SelectMode::SelectAllExceptSmallestSize => select_all_except_by_property(&current_model, active_tab, Property::Size, false),
             SelectMode::SelectAllExceptBiggestResolution => select_all_except_by_property(&current_model, active_tab, Property::Resolution, true),
             SelectMode::SelectAllExceptBiggestResolutionAndSize => select_all_except_by_property(&current_model, active_tab, Property::ResolutionThenSize, true),
+            SelectMode::SelectAllExceptLargestFileNearHighestResolution => select_all_except_by_property(
+                &current_model,
+                active_tab,
+                Property::SizeNearHighestResolution(app.global::<Settings>().get_selection_resolution_tolerance().clamp(0, 100) as u32),
+                true,
+            ),
             SelectMode::SelectAllExceptSmallestResolution => select_all_except_by_property(&current_model, active_tab, Property::Resolution, false),
             SelectMode::SelectAllExceptNewest => select_all_except_by_property(&current_model, active_tab, Property::Date, true),
             SelectMode::SelectAllExceptOldest => select_all_except_by_property(&current_model, active_tab, Property::Date, false),
@@ -167,6 +175,7 @@ enum Property {
     PathLength,
     Resolution,
     ResolutionThenSize,
+    SizeNearHighestResolution(u32),
 }
 
 pub(crate) fn set_select_buttons(app: &MainWindow) {
@@ -207,6 +216,10 @@ pub(crate) fn set_select_buttons(app: &MainWindow) {
             (SelectMode::SelectAllExceptSmallestResolution, settings.get_select_show_except_smallest_resolution()),
             (SelectMode::SelectAllExceptBiggestResolution, settings.get_select_show_except_biggest_resolution()),
             (SelectMode::SelectAllExceptBiggestResolutionAndSize, settings.get_select_show_except_biggest_resolution()),
+            (
+                SelectMode::SelectAllExceptLargestFileNearHighestResolution,
+                settings.get_select_show_except_biggest_resolution(),
+            ),
             (SelectMode::SelectAllExceptShortestPath, settings.get_select_show_except_shortest_path()),
             (SelectMode::SelectAllExceptLongestPath, settings.get_select_show_except_longest_path()),
         ],
@@ -241,6 +254,9 @@ pub(crate) fn set_select_buttons(app: &MainWindow) {
 fn extract_comparable_field(model: &SingleMainListModel, property: Property, active_tab: ActiveTab) -> u128 {
     let mut val_ints = model.val_int.iter();
     u128::from(match property {
+        Property::SizeNearHighestResolution(_) => {
+            return (extract_comparable_field(model, Property::Size, active_tab) << 64) | extract_comparable_field(model, Property::Resolution, active_tab);
+        }
         Property::ResolutionThenSize => {
             return (extract_comparable_field(model, Property::Resolution, active_tab) << 64) | extract_comparable_field(model, Property::Size, active_tab);
         }
@@ -310,56 +326,6 @@ fn select_by_property(model: &ModelRc<SingleMainListModel>, active_tab: ActiveTa
     }
 
     (checked_items, 0, ModelRc::new(VecModel::from(old_data)))
-}
-
-// Selects all items in each group EXCEPT the one with the extreme property value.
-// `spare_max: true`  → spares the biggest/newest/longest item (selects all others).
-// `spare_max: false` → spares the smallest/oldest/shortest item (selects all others).
-fn select_all_except_by_property(model: &ModelRc<SingleMainListModel>, active_tab: ActiveTab, property: Property, spare_max: bool) -> SelectionResult {
-    let mut checked_items = 0;
-    let mut unchecked_items = 0;
-
-    let is_header_mode = active_tab.get_is_header_mode();
-    assert!(is_header_mode);
-
-    let mut old_data = model.iter().collect::<Vec<_>>();
-    // Capture previous checked state before find_header_idx_and_deselect_all clears all flags,
-    // so the returned delta is relative to the actual prior selection.
-    let prev_checked: Vec<bool> = old_data.iter().map(|m| m.checked).collect();
-    let headers_idx = find_header_idx_and_deselect_all(&mut old_data);
-
-    for i in 0..(headers_idx.len() - 1) {
-        let group_start = headers_idx[i] + 1;
-        let group_end = headers_idx[i + 1];
-
-        // Find the extreme item to spare.
-        let mut extreme_val = if spare_max { 0u128 } else { u128::MAX };
-        let mut extreme_idx = group_start;
-        for j in group_start..group_end {
-            let val = extract_comparable_field(&old_data[j], property, active_tab);
-            if spare_max && val > extreme_val || !spare_max && val < extreme_val {
-                extreme_val = val;
-                extreme_idx = j;
-            }
-        }
-
-        // Select every item except the extreme one.
-        for j in group_start..group_end {
-            if j == extreme_idx {
-                if prev_checked[j] {
-                    unchecked_items += 1;
-                }
-                old_data[j].checked = false;
-            } else {
-                if !prev_checked[j] {
-                    checked_items += 1;
-                }
-                old_data[j].checked = true;
-            }
-        }
-    }
-
-    (checked_items, unchecked_items, ModelRc::new(VecModel::from(old_data)))
 }
 
 fn select_all(model: &ModelRc<SingleMainListModel>) -> SelectionResult {
@@ -459,3 +425,6 @@ fn find_header_idx_and_deselect_all(old_data: &mut [SingleMainListModel]) -> Vec
 
 #[cfg(test)]
 mod tests;
+
+#[cfg(test)]
+mod tolerance_tests;
