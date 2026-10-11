@@ -8,6 +8,8 @@ set export := true
 adb := "adb"
 apk_package := "io.github.qarmin.cedinia"
 apk_activity := "android.app.NativeActivity"
+# Match the Windows Skia OpenGL release variant to avoid blurry text with FemtoVG.
+krokiet_renderer_flags := if os() == "windows" { "--no-default-features --features winit_skia_opengl,winit_software" } else { "" }
 
 build_all: && fix
     cargo build --release
@@ -25,10 +27,10 @@ itests:
 ## run
 
 run +args:
-    cargo run --bin {{args}}
+    cargo run --bin {{args}} {{if args == "krokiet" { krokiet_renderer_flags } else { "" }}}
 
 runr +args:
-    cargo run --profile fast_release --bin {{args}}
+    cargo run --profile fast_release --bin {{args}} {{if args == "krokiet" { krokiet_renderer_flags } else { "" }}}
 
 runc +args:
     CARGO_PROFILE_DEV_CODEGEN_BACKEND=cranelift cargo +nightly run -Zcodegen-backend --bin {{args}}
