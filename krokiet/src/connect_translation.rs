@@ -543,6 +543,7 @@ pub(crate) fn translate_select_mode(select_mode: SelectMode) -> SharedString {
         SelectMode::SelectLongestPath => flk!("selection_longest_path").into(),
         SelectMode::SelectAllExceptBiggestSize => flk!("selection_all_except_biggest_size").into(),
         SelectMode::SelectAllExceptSmallestSize => flk!("selection_all_except_smallest_size").into(),
+        SelectMode::SelectAllExceptBiggestResolutionAndSize => flk!("selection_all_except_biggest_resolution_and_size").into(),
         SelectMode::SelectAllExceptBiggestResolution => flk!("selection_all_except_biggest_resolution").into(),
         SelectMode::SelectAllExceptSmallestResolution => flk!("selection_all_except_smallest_resolution").into(),
         SelectMode::SelectAllExceptNewest => flk!("selection_all_except_newest").into(),

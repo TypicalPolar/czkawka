@@ -200,6 +200,7 @@ selection_shortest_path = Select the shortest path
 selection_longest_path = Select the longest path
 selection_all_except_biggest_size = Select all except biggest size
 selection_all_except_smallest_size = Select all except smallest size
+selection_all_except_biggest_resolution_and_size = Select all except biggest resolution and biggest size
 selection_all_except_biggest_resolution = Select all except biggest resolution
 selection_all_except_smallest_resolution = Select all except smallest resolution
 selection_all_except_newest = Select all except newest
